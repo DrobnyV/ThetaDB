@@ -1,11 +1,6 @@
 cerpano.txt
 src/config.ini
-.idea/misc.xml
-.idea/modules.xml
-.idea/inspectionProfiles/profiles_settings.xml
-.idea/Theta.iml
-.idea/vcs.xml
-
+.idea
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
