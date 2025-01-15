@@ -17,9 +17,11 @@ def index():
 def list_items(model):
     try:
         model_class = globals()[model]
-        raw_items = model_class(db_connection).select_all()
-        items = [{'id': item[0], 'jmeno': item[1], 'prijmeni': item[2]} for item in raw_items]
-        return render_template('list.html', items=items, model=model)
+        model_instance = model_class(db_connection)
+        raw_items = model_instance.select_all()
+        items = [{'id': item[0], 'jmeno': item[1], 'prijmeni': item[2]} for item in raw_items] if model == 'Zakaznik' else list(raw_items)
+        column_names = model_instance.get_column_names()
+        return render_template('list.html', items=items, model=model, columns=column_names)
     except KeyError:
         return "Model not found", 404
 

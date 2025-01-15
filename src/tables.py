@@ -37,6 +37,19 @@ class BaseTable:
         finally:
             cursor.close()
 
+    def get_column_names(self):
+        cursor = self.db.cursor()
+        try:
+            cursor.execute(f"SHOW COLUMNS FROM {self.__class__.__name__}")
+            columns = cursor.fetchall()
+            # MySQL returns column information differently from SQLite
+            return [column[0] for column in columns]
+        except mysql.connector.Error as err:
+            print(f"Chyba při načítání sloupců: {err}")
+            return []
+        finally:
+            cursor.close()
+
     def create(self):
         pass
 

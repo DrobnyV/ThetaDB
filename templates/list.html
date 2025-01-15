@@ -3,13 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <title>List of {{ model }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <h1>List of {{ model }}</h1>
-    <ul>
-    {% for item in items %}
-        <li>ID: {{ item.id }}, Jmeno: {{ item.jmeno }}, Prijmeni: {{ item.prijmeni }}</li>
-    {% endfor %}
-    </ul>
+    <table>
+        <thead>
+            <tr>
+                {% for column in columns %}
+                <th>{{ column }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                {% if model == 'Zakaznik' %}
+                <td>{{ item.id }}</td>
+                <td>{{ item.jmeno }}</td>
+                <td>{{ item.prijmeni }}</td>
+                {% else %}
+                {% for value in item %}
+                <td>{{ value }}</td>
+                {% endfor %}
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>
