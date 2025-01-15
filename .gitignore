@@ -1,5 +1,5 @@
 cerpano.txt
-config.ini
+src/config.ini
 .idea/misc.xml
 .idea/modules.xml
 .idea/inspectionProfiles/profiles_settings.xml

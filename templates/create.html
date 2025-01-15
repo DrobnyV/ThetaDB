@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create {{ model }}</title>
+</head>
+<body>
+    <h1>Create {{ model }}</h1>
+    <form action="/create/{{ model }}" method="post">
+        {% for field in model_fields %}
+            <label for="{{ field }}">{{ field }}</label>
+            <input type="text" name="{{ field }}" id="{{ field }}">
+            <br>
+        {% endfor %}
+        <button type="submit">Save</button>
+    </form>
+    <a href="/">Back to Home</a>
+</body>
+</html>
