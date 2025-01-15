@@ -2,20 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Hotel Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>Hotel Management System</h1>
-    <ul>
-        <li><a href="/list/Zeme">Zeme</a></li>
-        <li><a href="/list/Adresa">Adresa</a></li>
-        <li><a href="/list/Zakaznik">Zakaznik</a></li>
-        <li><a href="/list/Typ_pokoje">Typ_pokoje</a></li>
-        <li><a href="/list/Pokoj">Pokoj</a></li>
-        <li><a href="/list/Doprava">Doprava</a></li>
-        <li><a href="/list/Rezervace">Rezervace</a></li>
-        <li><a href="/list/Pokoj_v_rezervaci">Pokoj_v_rezervaci</a></li>
-        <li><a href="/list/Audit_log">Audit_log</a></li>
-    </ul>
+    <header>
+        <h1>Hotel Management System</h1>
+        <nav>
+            <ul>
+                <li><a href="/home">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Welcome to the Hotel Management System</h2>
+        <ul>
+            <li><a href="/list/Zeme">Zeme</a></li>
+            <li><a href="/list/Adresa">Adresa</a></li>
+            <li><a href="/list/Zakaznik">Zakaznik</a></li>
+            <li><a href="/list/Typ_pokoje">Typ pokoje</a></li>
+            <li><a href="/list/Pokoj">Pokoj</a></li>
+            <li><a href="/list/Doprava">Doprava</a></li>
+            <li><a href="/list/Rezervace">Rezervace</a></li>
+            <li><a href="/list/Pokoj_v_rezervaci">Pokoj v rezervaci</a></li>
+            <li><a href="/list/Audit_log">Audit log</a></li>
+        </ul>
+    </main>
+    <footer>
+        <p>&copy; 2025 Hotel Management System. All rights reserved.</p>
+    </footer>
 </body>
 </html>
