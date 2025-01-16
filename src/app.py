@@ -33,17 +33,24 @@ def update_item(model, id):
         model_class = globals()[model]
         model_instance = model_class(db_connection)
         if request.method == 'POST':
-            model_instance.load(id)
-            # Update the instance with form data
-            for key, value in request.form.items():
-                setattr(model_instance, key, value)
-            model_instance.update()
-            return redirect(url_for('list_items', model=model))
+            try:
+                db_connection.begin()  # Start the transaction
+                model_instance.load(id)
+                # Update the instance with form data
+                for key, value in request.form.items():
+                    setattr(model_instance, key, value)
+                model_instance.update()
+                db_connection.commit()  # Commit the transaction
+                return redirect(url_for('list_items', model=model))
+            except Exception as e:
+                db_connection.rollback()  # Rollback the transaction in case of error
+                return f"Error during update: {str(e)}", 500
         else:
             model_instance.load(id)
             return render_template('update.html', item=model_instance.__dict__, model=model)
     except KeyError:
         return "Model not found", 404
+
 
 @app.route('/delete/<model>/<id>')
 def delete_item(model, id):
@@ -105,19 +112,26 @@ def add_item(model):
     try:
         model_class = globals()[model]
         if request.method == 'POST':
-            new_item = model_class(db_connection)
+            try:
+                db_connection.begin()
+                new_item = model_class(db_connection)
 
-            for key, value in request.form.items():
-                if hasattr(new_item, key):
-                    setattr(new_item, key, value)
+                for key, value in request.form.items():
+                    if hasattr(new_item, key):
+                        setattr(new_item, key, value)
 
-            new_item.create()
-            return redirect(url_for('list_items', model=model))
+                new_item.create()
+                db_connection.commit()  # Commit the transaction
+                return redirect(url_for('list_items', model=model))
+            except Exception as e:
+                db_connection.rollback()  # Rollback the transaction in case of error
+                return f"Error during addition: {str(e)}", 500
 
         column_names = model_class(db_connection).get_column_names()
         return render_template('add_item.html', model=model, columns=column_names)
     except KeyError:
         return "Model not found", 404
+
 
 
 if __name__ == '__main__':
