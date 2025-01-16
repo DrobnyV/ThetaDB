@@ -8,12 +8,20 @@ class BaseTable:
     def execute(self, sql, params=None):
         cursor = self.db.cursor()
         try:
+            while cursor.nextset():
+                pass
+
             if params:
                 cursor.execute(sql, params)
             else:
                 cursor.execute(sql)
-            self.db.commit()
-            return cursor
+            # Fetch all results if it's a SELECT query
+            if sql.strip().upper().startswith("SELECT"):
+                result = cursor.fetchall()
+                return result
+            else:
+                self.db.commit()
+                return cursor
         except mysql.connector.Error as err:
             print(f"Chyba při provádění SQL: {err}")
             self.db.rollback()
@@ -88,11 +96,12 @@ class Zeme(BaseTable):
 
     def load(self, id):
         sql = "SELECT * FROM Zeme WHERE ID=%s"
-        cursor = self.execute(sql, (id,))
-        if cursor:
-            row = cursor.fetchone()
-            if row:
-                self.id, self.nazev, self.iso_kod, self.mena, self.uredni_jazyk, self.region = row
+        result = self.execute(sql, (id,))
+        if result:
+            row = result[0]
+            self.id, self.nazev, self.iso_kod, self.mena, self.uredni_jazyk, self.region = row
+        else:
+            print("No record found for id:", id)
 
 class Adresa(BaseTable):
     def __init__(self, db_connection, mesto=None, cislo_popisne=None, psc=None, zeme_id=None):

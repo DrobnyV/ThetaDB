@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update {{ model }}</title>
+</head>
+<body>
+    <h1>Update {{ model }} with ID: {{ item.id }}</h1>
+    <form method="POST">
+        {% for key, value in item.items() if key != 'id' and key != 'db' %}
+        <label for="{{ key }}">{{ key }}:</label><br>
+        <input type="text" id="{{ key }}" name="{{ key }}" value="{{ value }}"><br>
+        {% endfor %}
+        <input type="submit" value="Update">
+    </form>
+    <a href="{{ url_for('list_items', model=model) }}"><button>Back to List</button></a>
+</body>
+</html>

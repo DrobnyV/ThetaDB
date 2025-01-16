@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Find {{ model }}</title>
+</head>
+<body>
+    <h1>Found {{ model }} with ID: {{ item.id }}</h1>
+    <table>
+        <thead>
+            <tr>
+                {% for key, value in item.items() if key != 'db' %}
+                <th>{{ key }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                {% for key, value in item.items() if key != 'db' %}
+                <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+    <a href="{{ url_for('list_items', model=model) }}"><button>Back to List</button></a>
+</body>
+</html>

@@ -13,20 +13,21 @@
                 {% for column in columns %}
                 <th>{{ column }}</th>
                 {% endfor %}
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for item in items %}
             <tr>
-                {% if model == 'Zakaznik' %}
-                <td>{{ item.id }}</td>
-                <td>{{ item.jmeno }}</td>
-                <td>{{ item.prijmeni }}</td>
-                {% else %}
                 {% for value in item %}
                 <td>{{ value }}</td>
                 {% endfor %}
-                {% endif %}
+                <td>
+                    <a href="{{ url_for('view_items', model=model) }}"><button>View</button></a>
+                    <a href="{{ url_for('update_item', model=model, id=item[0]) }}"><button>Update</button></a>
+                    <a href="{{ url_for('delete_item', model=model, id=item[0]) }}"><button>Delete</button></a>
+                    <a href="{{ url_for('find_item', model=model, id=item[0]) }}"><button>Find</button></a>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
