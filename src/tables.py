@@ -297,7 +297,10 @@ class Rezervace(BaseTable):
             if cursor:
                 row = cursor.fetchone()
                 if row:
-                    print("Získaná data:", row)
+                    (self.cislo_rezervace, self.datum_od, self.datum_do, self.check_in_do,
+                     self.check_out_do, self.celkova_cena, self.snidane, self.vratna_rezervace,
+                     self.pocet_deti, self.pocet_dospelych, self.adresa_id, self.zakaznik_id,
+                     self.doprava_id, self.stav) = row
                 else:
                     print("Rezervace nenalezena.")
         except mysql.connector.Error as err:

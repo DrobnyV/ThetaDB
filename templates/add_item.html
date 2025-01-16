@@ -2,19 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Find Items</title>
+    <title>Add New {{ model }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>Find Items</h1>
-    <form action="{{ url_for('find_items', model=model) }}" method="post">
+    <h1>Add New {{ model }}</h1>
+    <form action="{{ url_for('add_item', model=model) }}" method="post">
         {% for column in columns %}
         <div>
             <label for="{{ column }}">{{ column }}:</label>
             <input type="text" id="{{ column }}" name="{{ column }}" placeholder="Enter {{ column }}">
         </div>
         {% endfor %}
-        <button type="submit">Search</button>
+        <button type="submit">Add</button>
     </form>
 </body>
 </html>
