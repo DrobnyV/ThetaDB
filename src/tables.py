@@ -4,6 +4,7 @@ class BaseTable:
     def __init__(self, db_connection):
         self.db = db_connection
         self.id = None
+        self.cursor = db_connection.cursor()
 
     def execute(self, sql, params=None):
         cursor = self.db.cursor()
@@ -50,7 +51,6 @@ class BaseTable:
         try:
             cursor.execute(f"SHOW COLUMNS FROM {self.__class__.__name__}")
             columns = cursor.fetchall()
-            # MySQL returns column information differently from SQLite
             return [column[0] for column in columns]
         except mysql.connector.Error as err:
             print(f"Chyba při načítání sloupců: {err}")
@@ -111,6 +111,7 @@ class Adresa(BaseTable):
         self.psc = psc
         self.zeme_id = zeme_id
 
+
     def create(self):
         sql = "INSERT INTO Adresa (mesto, cislo_popisne, psc, zeme_ID) VALUES (%s, %s, %s, %s)"
         cursor = self.execute(sql, (self.mesto, self.cislo_popisne, self.psc, self.zeme_id))
@@ -133,6 +134,23 @@ class Adresa(BaseTable):
             row = cursor.fetchone()
             if row:
                 self.id, self.mesto, self.cislo_popisne, self.psc, self.zeme_id = row
+
+    def select_all(self):
+        try:
+            query = """
+                SELECT a.id, a.mesto, a.cislo_popisne, a.psc, z.nazev AS zeme_nazev
+                FROM adresa a
+                JOIN zeme z ON a.zeme_id = z.id
+            """
+            self.cursor.execute(query)
+            results = self.cursor.fetchall()
+            return results
+        except Exception as e:
+            print(f"Error in select_all: {str(e)}")
+            return None
+
+    def get_column_names(self):
+        return ['id', 'mesto', 'cislo_popisne', 'psc', 'zeme_jmeno']
 
 class Zakaznik(BaseTable):
     def __init__(self, db_connection, jmeno=None, prijmeni=None, telefon=None, email=None, zeme_id=None, vek=None):
@@ -226,6 +244,23 @@ class Pokoj(BaseTable):
             row = cursor.fetchone()
             if row:
                 self.id, self.cislo, self.pocet_posteli, self.typ_pokoje_id, self.velikost_pokoje = row
+
+    def get_column_names(self):
+        return ['id', 'cislo', 'pocet_posteli', 'velikost_pokoje_m3', 'typ_pokoje']
+
+    def select_all(self):
+        try:
+            query = """
+                SELECT p.id,p.cislo, p.pocet_posteli, p.velikost_pokoje, t.nazev AS typ_pokoje_nazev
+                FROM pokoj p
+                JOIN typ_pokoje t ON p.typ_pokoje_id = t.id
+            """
+            self.cursor.execute(query)
+            results = self.cursor.fetchall()
+            return results
+        except Exception as e:
+            print(f"Error in select_all: {str(e)}")
+            return None
 
 class Doprava(BaseTable):
     def __init__(self, db_connection, nazev=None, cena=None, popis=None):
