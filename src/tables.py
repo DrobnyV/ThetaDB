@@ -10,25 +10,23 @@ class BaseTable:
         cursor = self.db.cursor()
         try:
             while cursor.nextset():
-                pass
+                pass  # Clear any unread result sets
 
             if params:
                 cursor.execute(sql, params)
             else:
                 cursor.execute(sql)
-            # Fetch all results if it's a SELECT query
+
             if sql.strip().upper().startswith("SELECT"):
-                result = cursor.fetchall()
-                return result
+                return cursor  # Return cursor for SELECT statements
             else:
                 self.db.commit()
-                return cursor
+                return cursor  # Return cursor for non-SELECT statements
         except mysql.connector.Error as err:
             print(f"Chyba při provádění SQL: {err}")
             self.db.rollback()
             return None
-        finally:
-            cursor.close()
+        # Note: Caller should close the cursor
 
     def save(self):
         if self.id is None:
@@ -97,12 +95,14 @@ class Zeme(BaseTable):
 
     def load(self, id):
         sql = "SELECT * FROM Zeme WHERE ID=%s"
-        result = self.execute(sql, (id,))
-        if result:
-            row = result[0]
-            self.id, self.nazev, self.iso_kod, self.mena, self.uredni_jazyk, self.region = row
-        else:
-            print("No record found for id:", id)
+        cursor = self.execute(sql, (id,))
+        if cursor:
+            row = cursor.fetchone()
+            if row:
+                self.id, self.nazev, self.iso_kod, self.mena, self.uredni_jazyk, self.region = row
+            else:
+                print("No record found for id:", id)
+        cursor.close()
 
 class Adresa(BaseTable):
     def __init__(self, db_connection, mesto=None, cislo_popisne=None, psc=None, zeme_id=None):
@@ -231,6 +231,11 @@ class Typ_pokoje(BaseTable):
             row = cursor.fetchone()
             if row:
                 self.id, self.nazev, self.popis = row
+            else:
+                raise ValueError(f"Typ_pokoje with ID {id} not found")
+        else:
+            raise Exception("Failed to execute query")
+        cursor.close()
 
 class Pokoj(BaseTable):
     def __init__(self, db_connection, cislo=None, pocet_posteli=None, typ_pokoje_id=None, velikost_pokoje=None):
@@ -241,7 +246,7 @@ class Pokoj(BaseTable):
         self.velikost_pokoje = velikost_pokoje
 
     def create(self):
-        sql = "INSERT INTO Pokoj (cislo, pocet_posteli, typ_pokoje_ID, velikost_pokoje) VALUES (%s, %s, %s, %s)"
+        sql = "INSERT INTO Pokoj (cislo, pocet_posteli, typ_pokoje_id, velikost_pokoje) VALUES (%s, %s, %s, %s)"
         cursor = self.execute(sql, (self.cislo, self.pocet_posteli, self.typ_pokoje_id, self.velikost_pokoje))
         if cursor:
             self.id = cursor.lastrowid

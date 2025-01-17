@@ -85,26 +85,28 @@ def find_items(model):
     if request.method == 'POST':
         try:
             model_class = globals()[model]
-            model_instance = model_class(db_connection)
-            # Get form data
+            instance = model_class(db_connection)
             search_criteria = {k: v for k, v in request.form.items() if v}
 
-            # Construct SQL query (Be cautious with SQL injection here, consider using parameterized queries)
-            where_clause = " AND ".join(f"{k} LIKE %s" for k in search_criteria.keys())
-            params = tuple(f"%{v}%" for v in search_criteria.values())
+            if search_criteria:
+                where_clause = " AND ".join([f"{k} LIKE %s" for k in search_criteria.keys()])
+                params = tuple(f'%{v}%' for v in search_criteria.values())
+                sql = f"SELECT * FROM {model} WHERE {where_clause}"
+                cursor = instance.execute(sql, params)
+                items = cursor.fetchall() if cursor else []
+                cursor.close() if cursor else None
+            else:
+                items = instance.select_all()
 
-            sql = f"SELECT * FROM {model} WHERE {where_clause}"
-            items = model_instance.execute(sql, params)
-            column_names = model_instance.get_column_names()
-
+            column_names = instance.get_column_names()
             return render_template('find_results.html', items=items, model=model, columns=column_names)
-        except KeyError:
-            return "Model not found", 404
+        except Exception as e:
+            print(f"Error during find: {str(e)}")
+            return "An error occurred", 500
     else:  # GET request
         try:
             model_class = globals()[model]
-            model_instance = model_class(db_connection)
-            column_names = model_instance.get_column_names()
+            column_names = model_class(db_connection).get_column_names()
             return render_template('find.html', columns=column_names, model=model)
         except KeyError:
             return "Model not found", 404
