@@ -21,7 +21,7 @@ def list_items(model):
         raw_items = model_instance.select_all()
         if raw_items is None:
             raw_items = []
-        items = [{'id': item[0], 'jmeno': item[1], 'prijmeni': item[2]} for item in raw_items] if model == 'Zakaznik' else list(raw_items)
+        items = list(raw_items)
         column_names = model_instance.get_column_names()
         return render_template('list.html', items=items, model=model, columns=column_names)
     except KeyError:

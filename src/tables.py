@@ -150,7 +150,7 @@ class Adresa(BaseTable):
             return None
 
     def get_column_names(self):
-        return ['id', 'mesto', 'cislo_popisne', 'psc', 'zeme_jmeno']
+        return ['id', 'mesto', 'cislo_popisne', 'psc', 'zeme_nazev']
 
 class Zakaznik(BaseTable):
     def __init__(self, db_connection, jmeno=None, prijmeni=None, telefon=None, email=None, zeme_id=None, vek=None):
@@ -184,6 +184,23 @@ class Zakaznik(BaseTable):
             row = cursor.fetchone()
             if row:
                 self.id, self.jmeno, self.prijmeni, self.telefon, self.email, self.zeme_id, self.vek = row
+
+    def select_all(self):
+        try:
+            query = """
+                SELECT z.id, z.jmeno, z.prijmeni, z.telefon, zm.nazev AS zeme_nazev
+                FROM zakaznik z
+                JOIN zeme zm ON z.zeme_id = zm.id
+            """
+            self.cursor.execute(query)
+            results = self.cursor.fetchall()
+            return results
+        except Exception as e:
+            print(f"Error in select_all: {str(e)}")
+            return None
+
+    def get_column_names(self):
+        return ['id', 'jmeno', 'prijmeni', 'telefon', 'zeme_nazev']
 
 class Typ_pokoje(BaseTable):
     def __init__(self, db_connection, nazev=None, popis=None):
@@ -340,6 +357,39 @@ class Rezervace(BaseTable):
                     print("Rezervace nenalezena.")
         except mysql.connector.Error as err:
             print(f"Chyba při načítání rezervace: {err}")
+
+    def select_all(self):
+        try:
+            query = """
+                SELECT 
+                    r.cislo_rezervace,
+                    r.datum_od,
+                    r.datum_do,
+                    r.check_in_do,
+                    r.check_out_do,
+                    r.celkova_cena,
+                    CASE 
+                        WHEN r.snidane = 1 THEN 'Ano'
+                        ELSE 'Ne'
+                    END AS snidane,
+                    CASE 
+                        WHEN r.vratna_rezervace = 1 THEN 'Ano'
+                        ELSE 'Ne'
+                    END AS vratna_rezervace,
+                    r.pocet_deti,
+                    r.pocet_dospelych,
+                    r.adresa_id,
+                    r.zakaznik_id,
+                    r.doprava_id,
+                    r.stav
+                FROM rezervace r
+            """
+            self.cursor.execute(query)
+            results = self.cursor.fetchall()
+            return results
+        except Exception as e:
+            print(f"Error in select_all: {str(e)}")
+            return None
 
 
 class Pokoj_v_rezervaci(BaseTable):
