@@ -17,6 +17,14 @@ th {
 tr:nth-child(even) {
     background-color: #f9f9f9;
 }
+
+.fixed-find-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000; /* Ensures button is above other elements */
+}
+
 .fixed-find-button button {
     background-color: #007bff; /* Blue background */
     color: white;
@@ -53,6 +61,30 @@ tr:nth-child(even) {
 .add-item-button button:hover {
     background-color: #218838; /* Darker green on hover */
 }
+
+/* New styles for Rezervace model buttons */
+.rezervace-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.rezervace-buttons button {
+    background-color: #dc3545; /* Red background for contrast */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.rezervace-buttons button:hover {
+    background-color: #c82333; /* Darker red on hover */
+}
+
 /*
 index.html
 */

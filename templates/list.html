@@ -4,14 +4,6 @@
     <meta charset="UTF-8">
     <title>List of {{ model }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <style>
-        /* CSS for sticky find button */
-        .fixed-find-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-        }
-    </style>
 </head>
 <body>
     <h1>List of {{ model }}</h1>
@@ -39,11 +31,25 @@
         </tbody>
     </table>
     <div class="add-item-button">
-    <a href="{{ url_for('add_item', model=model) }}"><button>Add</button></a>
-</div>
-   <div class="fixed-find-button">
-    <a href="{{ url_for('find_items', model=model) }}"><button>Find</button></a>
-</div>
+        <a href="{{ url_for('add_item', model=model) }}"><button>Add</button></a>
+    </div>
+    <div class="fixed-find-button">
+        <a href="{{ url_for('find_items', model=model) }}"><button>Find</button></a>
+    </div>
+
+    {% if model == 'Rezervace' %}
+    <div class="rezervace-buttons">
+        <a href="javascript:void(0)" onclick="window.open('{{ url_for('list_adresa') }}', 'adresaWindow', 'width=800,height=600')">
+            <button>Adresy</button>
+        </a>
+        <a href="javascript:void(0)" onclick="window.open('{{ url_for('list_zakaznik') }}', 'zakaznikWindow', 'width=800,height=600')">
+            <button>Zákazníci</button>
+        </a>
+        <a href="javascript:void(0)" onclick="window.open('{{ url_for('list_doprava') }}', 'dopravaWindow', 'width=800,height=600')">
+            <button>Doprava</button>
+        </a>
+    </div>
+    {% endif %}
 
 </body>
 </html>

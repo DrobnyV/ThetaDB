@@ -134,6 +134,17 @@ def add_item(model):
     except KeyError:
         return "Model not found", 404
 
+@app.route('/list/adresa')
+def list_adresa():
+    return list_items('Adresa')
+
+@app.route('/list/zakaznik')
+def list_zakaznik():
+    return list_items('Zakaznik')
+
+@app.route('/list/doprava')
+def list_doprava():
+    return list_items('Doprava')
 
 
 if __name__ == '__main__':
