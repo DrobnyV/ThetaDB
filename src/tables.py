@@ -79,8 +79,9 @@ class Zeme(BaseTable):
         self.uredni_jazyk = uredni_jazyk
         self.region = region
 
+
     def create(self):
-        sql = "INSERT INTO Zeme (nazev, ISO_kod, mena, uredni_jazyk, region) VALUES (%s, %s, %s, %s, %s)"
+        sql = "INSERT INTO Zeme (nazev, iso_kod, mena, uredni_jazyk, region) VALUES (%s, %s, %s, %s, %s)"
         cursor = self.execute(sql, (self.nazev, self.iso_kod, self.mena, self.uredni_jazyk, self.region))
         if cursor:
             self.id = cursor.lastrowid
@@ -92,7 +93,7 @@ class Zeme(BaseTable):
     def delete(self):
         sql = "DELETE FROM Zeme WHERE ID=%s"
         self.execute(sql, (self.id,))
-        self.id = None  # Reset id po smazání
+        self.id = None
 
     def load(self, id):
         sql = "SELECT * FROM Zeme WHERE ID=%s"
