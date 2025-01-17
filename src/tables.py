@@ -189,7 +189,7 @@ class Zakaznik(BaseTable):
     def select_all(self):
         try:
             query = """
-                SELECT z.id, z.jmeno, z.prijmeni, z.telefon, zm.nazev AS zeme_nazev
+                SELECT z.id, z.jmeno, z.prijmeni,z.email, z.telefon,z.vek, zm.nazev AS zeme_nazev
                 FROM zakaznik z
                 JOIN zeme zm ON z.zeme_id = zm.id
             """
@@ -201,7 +201,7 @@ class Zakaznik(BaseTable):
             return None
 
     def get_column_names(self):
-        return ['id', 'jmeno', 'prijmeni', 'telefon', 'zeme_nazev']
+        return ['id', 'jmeno', 'prijmeni', 'email', 'telefon', 'vek', 'zeme_nazev']
 
 class Typ_pokoje(BaseTable):
     def __init__(self, db_connection, nazev=None, popis=None):

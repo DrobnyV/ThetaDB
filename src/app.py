@@ -115,27 +115,60 @@ def find_items(model):
 @app.route('/add/<model>', methods=['GET', 'POST'])
 def add_item(model):
     try:
-        model_class = globals()[model]
+        # Define the columns for each model
+        columns = []
+        if model == 'Pokoj':
+            columns = ['cislo', 'pocet_posteli', 'typ_pokoje_nazev', 'velikost_pokoje']
+        elif model == 'Zakaznik':
+            columns = ['jmeno', 'prijmeni', 'telefon', 'email', 'zeme_nazev', 'vek']
+        elif model == 'Rezervace':
+            columns = ['cislo_rezervace', 'datum_od', 'datum_do', 'check_in_do', 'check_out_do',
+                       'celkova_cena', 'snidane', 'vratna_rezervace', 'pocet_deti', 'pocet_dospelych',
+                       'adresa_ID', 'zakaznik_ID', 'doprava_ID', 'stav']
+
+        # If the method is POST, process the form data
         if request.method == 'POST':
-            try:
+            form_data = request.form.to_dict()
 
-                new_item = model_class(db_connection)
+            # Handle the foreign key lookups for Zeme and Typ_pokoje
+            if 'zeme_nazev' in form_data:
+                zeme_nazev = form_data['zeme_nazev']
+                zeme_cursor = db_connection.cursor()
+                zeme_cursor.execute("SELECT ID FROM Zeme WHERE nazev = %s", (zeme_nazev,))
+                zeme_row = zeme_cursor.fetchone()
+                if zeme_row:
+                    form_data['zeme_id'] = zeme_row[0]  # Use zeme_id, not zeme_ID
+                else:
+                    return "Zeme not found", 400
 
-                for key, value in request.form.items():
-                    if hasattr(new_item, key):
-                        setattr(new_item, key, value)
+            if 'typ_pokoje_nazev' in form_data:
+                typ_pokoje_nazev = form_data['typ_pokoje_nazev']
+                typ_pokoje_cursor = db_connection.cursor()
+                typ_pokoje_cursor.execute("SELECT ID FROM Typ_pokoje WHERE nazev = %s", (typ_pokoje_nazev,))
+                typ_pokoje_row = typ_pokoje_cursor.fetchone()
+                if typ_pokoje_row:
+                    form_data['typ_pokoje_id'] = typ_pokoje_row[0]  # Use typ_pokoje_id, not typ_pokoje_ID
+                else:
+                    return "Typ pokoje not found", 400
 
-                new_item.create()
+            # Remove foreign key name fields from the form data dictionary before passing to the model constructor
+            form_data.pop('zeme_nazev', None)
+            form_data.pop('typ_pokoje_nazev', None)
 
-                return redirect(url_for('list_items', model=model))
-            except Exception as e:
+            # Create the model instance and save data to the database
+            model_class = globals()[model]
+            model_instance = model_class(db_connection, **form_data)
+            model_instance.create()  # Assuming `create()` method is present for each model
 
-                return f"Error during addition: {str(e)}", 500
+            return redirect(url_for('list_items', model=model))
 
-        column_names = model_class(db_connection).get_column_names()
-        return render_template('add_item.html', model=model, columns=column_names)
-    except KeyError:
-        return "Model not found", 404
+        # Render the form with columns for the model
+        return render_template('add_item.html', model=model, columns=columns)
+
+    except Exception as e:
+        return str(e), 500
+
+
 
 @app.route('/list/adresa')
 def list_adresa():
