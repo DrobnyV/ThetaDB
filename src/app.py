@@ -232,6 +232,124 @@ def summary_report():
         conn.close()
         return "Error fetching summary report", 500
 
+def refresh_db_connection():
+    global db_connection
+    if db_connection is not None:
+        db_connection.close()  # Close the current connection
+    db_connection = get_db_connection()  # Create a new connection
+
+
+@app.route('/import/<model>', methods=['GET', 'POST'])
+def import_data(model):
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            return "No file part", 400
+
+        file = request.files['file']
+        if file.filename == '':
+            return "No selected file", 400
+
+        if file:
+            file_extension = file.filename.split('.')[-1].lower()
+            data = None
+
+            if file_extension == 'csv':
+                import csv
+                data = csv.reader(file.stream.read().decode('utf-8').splitlines())
+                process_csv_data_with_classes(model, data)
+            elif file_extension == 'json':
+                import json
+                data = json.load(file)
+                process_json_data_with_classes(model, data)
+            elif file_extension == 'xml':
+                import xml.etree.ElementTree as ET
+                tree = ET.parse(file.stream)
+                root = tree.getroot()
+                process_xml_data_with_classes(model, root)
+            else:
+                return "Unsupported file format", 400
+            refresh_db_connection()
+            return f"Data imported into {model} successfully!", 200
+
+    return render_template('import_data.html', model=model)
+
+
+def process_csv_data_with_classes(model, data):
+    db_connection = get_db_connection()
+
+    if model == 'Zeme':
+        for row in data:
+            zeme = Zeme(
+                db_connection,
+                nazev=row[0],
+                iso_kod=row[1],
+                mena=row[2],
+                uredni_jazyk=row[3],
+                region=row[4]
+            )
+            zeme.create()
+
+    elif model == 'Typ_pokoje':
+        for row in data:
+            typ_pokoje = Typ_pokoje(
+                db_connection,
+                nazev=row[0],
+                popis=row[1] if len(row) > 1 else None
+            )
+            typ_pokoje.create()
+
+
+def process_json_data_with_classes(model, data):
+    db_connection = get_db_connection()
+
+    if model == 'Zeme':
+        for record in data:
+            zeme = Zeme(
+                db_connection,
+                nazev=record['nazev'],
+                iso_kod=record['ISO_kod'],
+                mena=record['mena'],
+                uredni_jazyk=record['uredni_jazyk'],
+                region=record['region']
+            )
+            zeme.create()
+
+    elif model == 'Typ_pokoje':
+        for record in data:
+            typ_pokoje = Typ_pokoje(
+                db_connection,
+                nazev=record['nazev'],
+                popis=record.get('popis')
+            )
+            typ_pokoje.create()
+
+
+def process_xml_data_with_classes(model, root):
+    db_connection = get_db_connection()
+
+    if model == 'Zeme':
+        for item in root.findall('Item'):
+            zeme = Zeme(
+                db_connection,
+                nazev=item.find('nazev').text,
+                iso_kod=item.find('ISO_kod').text,
+                mena=item.find('mena').text,
+                uredni_jazyk=item.find('uredni_jazyk').text,
+                region=item.find('region').text
+            )
+            zeme.create()
+
+    elif model == 'Typ_pokoje':
+        for item in root.findall('Item'):
+            typ_pokoje = Typ_pokoje(
+                db_connection,
+                nazev=item.find('nazev').text,
+                popis=item.find('popis').text if item.find('popis') is not None else None
+            )
+            typ_pokoje.create()
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

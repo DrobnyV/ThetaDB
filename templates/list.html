@@ -41,6 +41,12 @@
         <a href="{{ url_for('find_items', model=model) }}"><button>Find</button></a>
     </div>
 
+    {% if model in ['Zeme', 'Typ_pokoje'] %}
+    <div class="import-button">
+        <a href="{{ url_for('import_data', model=model) }}"><button>Import from CSV, XML, or JSON</button></a>
+    </div>
+    {% endif %}
+
     {% if model == 'Rezervace' %}
     <div class="rezervace-buttons">
         <a href="javascript:void(0)" onclick="window.open('{{ url_for('list_adresa') }}', 'adresaWindow', 'width=800,height=600')">

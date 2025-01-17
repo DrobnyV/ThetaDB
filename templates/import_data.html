@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import {{ model }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Import Data into {{ model }}</h1>
+    </header>
+    <main>
+        <form action="{{ url_for('import_data', model=model) }}" method="post" enctype="multipart/form-data">
+            <div>
+                <label for="file">Upload File (CSV, JSON, XML):</label>
+                <input type="file" id="file" name="file" required>
+            </div>
+            <button type="submit">Import</button>
+        </form>
+    </main>
+    <footer>
+        <a href="{{ url_for('list_items', model=model) }}">Back to {{ model }}</a>
+    </footer>
+</body>
+</html>
