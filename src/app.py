@@ -39,7 +39,7 @@ def update_item(model, id):
             try:
 
                 model_instance.load(id)
-                # Update the instance with form data
+
                 for key, value in request.form.items():
                     setattr(model_instance, key, value)
                 model_instance.update()
@@ -103,7 +103,7 @@ def find_items(model):
         except Exception as e:
             print(f"Error during find: {str(e)}")
             return "An error occurred", 500
-    else:  # GET request
+    else:
         try:
             model_class = globals()[model]
             column_names = model_class(db_connection).get_column_names()
@@ -115,7 +115,6 @@ def find_items(model):
 @app.route('/add/<model>', methods=['GET', 'POST'])
 def add_item(model):
     try:
-        # Define the columns for each model
         columns = []
         if model == 'Pokoj':
             columns = ['cislo', 'pocet_posteli', 'typ_pokoje_nazev', 'velikost_pokoje']
@@ -126,18 +125,18 @@ def add_item(model):
                        'celkova_cena', 'snidane', 'vratna_rezervace', 'pocet_deti', 'pocet_dospelych',
                        'adresa_ID', 'zakaznik_ID', 'doprava_ID', 'stav']
 
-        # If the method is POST, process the form data
+
         if request.method == 'POST':
             form_data = request.form.to_dict()
 
-            # Handle the foreign key lookups for Zeme and Typ_pokoje
+
             if 'zeme_nazev' in form_data:
                 zeme_nazev = form_data['zeme_nazev']
                 zeme_cursor = db_connection.cursor()
                 zeme_cursor.execute("SELECT ID FROM Zeme WHERE nazev = %s", (zeme_nazev,))
                 zeme_row = zeme_cursor.fetchone()
                 if zeme_row:
-                    form_data['zeme_id'] = zeme_row[0]  # Use zeme_id, not zeme_ID
+                    form_data['zeme_id'] = zeme_row[0]
                 else:
                     return "Zeme not found", 400
 
@@ -147,22 +146,22 @@ def add_item(model):
                 typ_pokoje_cursor.execute("SELECT ID FROM Typ_pokoje WHERE nazev = %s", (typ_pokoje_nazev,))
                 typ_pokoje_row = typ_pokoje_cursor.fetchone()
                 if typ_pokoje_row:
-                    form_data['typ_pokoje_id'] = typ_pokoje_row[0]  # Use typ_pokoje_id, not typ_pokoje_ID
+                    form_data['typ_pokoje_id'] = typ_pokoje_row[0]
                 else:
                     return "Typ pokoje not found", 400
 
-            # Remove foreign key name fields from the form data dictionary before passing to the model constructor
+
             form_data.pop('zeme_nazev', None)
             form_data.pop('typ_pokoje_nazev', None)
 
-            # Create the model instance and save data to the database
+
             model_class = globals()[model]
             model_instance = model_class(db_connection, **form_data)
-            model_instance.create()  # Assuming `create()` method is present for each model
+            model_instance.create()
 
             return redirect(url_for('list_items', model=model))
 
-        # Render the form with columns for the model
+
         return render_template('add_item.html', model=model, columns=columns)
 
     except Exception as e:
@@ -225,7 +224,7 @@ def zrus_rezervaci():
 
     try:
         cursor = conn.cursor()
-        # Call the stored procedure
+
         cursor.callproc('zrus_rezervaci', [rezervace_cislo])
         conn.commit()
         cursor.close()
@@ -248,7 +247,7 @@ def summary_report():
     try:
         cursor = conn.cursor(dictionary=True)
 
-        # Aggregated data query
+
         cursor.execute("""
             SELECT 
                 (SELECT COUNT(*) FROM Zakaznik) AS pocet_zakazniku,
@@ -270,8 +269,8 @@ def summary_report():
 def refresh_db_connection():
     global db_connection
     if db_connection is not None:
-        db_connection.close()  # Close the current connection
-    db_connection = get_db_connection()  # Create a new connection
+        db_connection.close()
+    db_connection = get_db_connection()
 
 
 @app.route('/import/<model>', methods=['GET', 'POST'])

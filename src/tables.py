@@ -10,7 +10,7 @@ class BaseTable:
         cursor = self.db.cursor()
         try:
             while cursor.nextset():
-                pass  # Clear any unread result sets
+                pass
 
             if params:
                 cursor.execute(sql, params)
@@ -18,15 +18,15 @@ class BaseTable:
                 cursor.execute(sql)
 
             if sql.strip().upper().startswith("SELECT"):
-                return cursor  # Return cursor for SELECT statements
+                return cursor
             else:
                 self.db.commit()
-                return cursor  # Return cursor for non-SELECT statements
+                return cursor
         except mysql.connector.Error as err:
             print(f"Chyba při provádění SQL: {err}")
             self.db.rollback()
             return None
-        # Note: Caller should close the cursor
+
 
     def save(self):
         if self.id is None:
@@ -337,7 +337,7 @@ class Rezervace(BaseTable):
         sql = "INSERT INTO Rezervace (cislo_rezervace, datum_od, datum_do, check_in_do, check_out_do, celkova_cena, snidane, vratna_rezervace, pocet_deti, pocet_dospelych, adresa_ID, zakaznik_ID, doprava_ID, stav) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         cursor = self.execute(sql, (self.cislo_rezervace, self.datum_od, self.datum_do, self.check_in_do, self.check_out_do, self.celkova_cena, self.snidane, self.vratna_rezervace, self.pocet_deti, self.pocet_dospelych, self.adresa_id, self.zakaznik_id, self.doprava_id, self.stav))
         if cursor:
-            self.id = cursor.lastrowid  # V Rezervace je primární klíč cislo_rezervace, takže toto nemusí být nutné
+            self.id = cursor.lastrowid
 
     def update(self):
         sql = "UPDATE Rezervace SET datum_od=%s, datum_do=%s, check_in_do=%s, check_out_do=%s, celkova_cena=%s, snidane=%s, vratna_rezervace=%s, pocet_deti=%s, pocet_dospelych=%s, adresa_ID=%s, zakaznik_ID=%s, doprava_ID=%s, stav=%s WHERE cislo_rezervace=%s"
@@ -346,7 +346,7 @@ class Rezervace(BaseTable):
     def delete(self):
         sql = "DELETE FROM Rezervace WHERE cislo_rezervace=%s"
         self.execute(sql, (self.cislo_rezervace,))
-        self.cislo_rezervace = None  # Reset cislo_rezervace po smazání
+        self.cislo_rezervace = None
 
     def load(self, cislo_rezervace):
         sql = "SELECT * FROM Rezervace WHERE cislo_rezervace=%s"
