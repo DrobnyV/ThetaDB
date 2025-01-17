@@ -146,6 +146,38 @@ def list_zakaznik():
 def list_doprava():
     return list_items('Doprava')
 
+@app.route('/view/obsazenost')
+def view_obsazenost():
+    conn = get_db_connection()
+    if not conn:
+        return "Database connection failed", 500
+
+    cursor = conn.cursor(dictionary=True)
+    query = "SELECT * FROM view_ObsazenostPokojuvRealnemCase"
+    cursor.execute(query)
+    results = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    columns = results[0].keys() if results else []
+    return render_template('view_results.html', model="Obsazenost Pokoju", columns=columns, items=results)
+
+@app.route('/view/financni_prehled')
+def view_financni_prehled():
+    conn = get_db_connection()
+    if not conn:
+        return "Database connection failed", 500
+
+    cursor = conn.cursor(dictionary=True)
+    query = "SELECT * FROM view_FinancniPrehledRezervaci"
+    cursor.execute(query)
+    results = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    columns = results[0].keys() if results else []
+    return render_template('view_results.html', model="Finanční Přehled", columns=columns, items=results)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

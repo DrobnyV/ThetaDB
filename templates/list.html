@@ -48,6 +48,12 @@
         <a href="javascript:void(0)" onclick="window.open('{{ url_for('list_doprava') }}', 'dopravaWindow', 'width=800,height=600')">
             <button>Doprava</button>
         </a>
+        <a href="{{ url_for('view_obsazenost') }}" target="_blank">
+            <button>Obsazenost Pokoju</button>
+        </a>
+        <a href="{{ url_for('view_financni_prehled') }}" target="_blank">
+            <button>Finanční Přehled</button>
+        </a>
     </div>
     {% endif %}
 

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ model }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>{{ model }}</h1>
+    <table>
+    <thead>
+        <tr>
+            {% for column in columns %}
+            <th>{{ column }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr>
+            {% for column in columns %}
+            <td>{{ item[column] }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>
