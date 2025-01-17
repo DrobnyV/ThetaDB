@@ -25,5 +25,20 @@
             {% endfor %}
         </tbody>
     </table>
+
+    {% if model == 'Rezervace' %}
+    <div class="rezervace-buttons">
+        <a href="javascript:void(0)" onclick="window.open('{{ url_for('list_adresa') }}', 'adresaWindow', 'width=800,height=600')">
+            <button>Adresy</button>
+        </a>
+        <a href="javascript:void(0)" onclick="window.open('{{ url_for('list_zakaznik') }}', 'zakaznikWindow', 'width=800,height=600')">
+            <button>Zákazníci</button>
+        </a>
+        <a href="javascript:void(0)" onclick="window.open('{{ url_for('list_doprava') }}', 'dopravaWindow', 'width=800,height=600')">
+            <button>Doprava</button>
+        </a>
+    </div>
+    {% endif %}
+
 </body>
 </html>
