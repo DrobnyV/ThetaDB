@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for
+import mysql
+from flask import Flask, render_template, request, redirect, url_for, flash
 from src.database import get_db_connection
 
 app = Flask(__name__, template_folder='../templates', static_folder='../static')
@@ -36,16 +37,16 @@ def update_item(model, id):
         model_instance = model_class(db_connection)
         if request.method == 'POST':
             try:
-                db_connection.begin()  # Start the transaction
+
                 model_instance.load(id)
                 # Update the instance with form data
                 for key, value in request.form.items():
                     setattr(model_instance, key, value)
                 model_instance.update()
-                db_connection.commit()  # Commit the transaction
+
                 return redirect(url_for('list_items', model=model))
             except Exception as e:
-                db_connection.rollback()  # Rollback the transaction in case of error
+
                 return f"Error during update: {str(e)}", 500
         else:
             model_instance.load(id)
@@ -115,7 +116,7 @@ def add_item(model):
         model_class = globals()[model]
         if request.method == 'POST':
             try:
-                db_connection.begin()
+
                 new_item = model_class(db_connection)
 
                 for key, value in request.form.items():
@@ -123,10 +124,10 @@ def add_item(model):
                         setattr(new_item, key, value)
 
                 new_item.create()
-                db_connection.commit()  # Commit the transaction
+
                 return redirect(url_for('list_items', model=model))
             except Exception as e:
-                db_connection.rollback()  # Rollback the transaction in case of error
+
                 return f"Error during addition: {str(e)}", 500
 
         column_names = model_class(db_connection).get_column_names()
@@ -177,6 +178,59 @@ def view_financni_prehled():
 
     columns = results[0].keys() if results else []
     return render_template('view_results.html', model="Finanční Přehled", columns=columns, items=results)
+
+
+@app.route('/zrus_rezervaci', methods=['POST'])
+def zrus_rezervaci():
+    rezervace_cislo = request.form.get('rezervace_cislo')
+
+    conn = get_db_connection()
+    if not conn:
+        return "Database connection failed", 500
+
+    try:
+        cursor = conn.cursor()
+        # Call the stored procedure
+        cursor.callproc('zrus_rezervaci', [rezervace_cislo])
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+        conn.rollback()
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for('list_items', model='Rezervace'))
+
+@app.route('/summary_report')
+def summary_report():
+    conn = get_db_connection()
+    if not conn:
+        return "Database connection failed", 500
+
+    try:
+        cursor = conn.cursor(dictionary=True)
+
+        # Aggregated data query
+        cursor.execute("""
+            SELECT 
+                (SELECT COUNT(*) FROM Zakaznik) AS pocet_zakazniku,
+                (SELECT COUNT(*) FROM Pokoj WHERE pocet_posteli >= 2) AS pokoje_s_vice_postelemi,
+                (SELECT MIN(celkova_cena) FROM Rezervace) AS nejlevnejsi_rezervace,
+                (SELECT MAX(celkova_cena) FROM Rezervace) AS nejdrazsi_rezervace,
+                (SELECT COUNT(*) FROM Rezervace WHERE datum_od >= CURDATE()) AS aktivni_rezervace
+        """)
+        report_data = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+        return render_template('summary_report.html', report_data=report_data)
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+        conn.close()
+        return "Error fetching summary report", 500
 
 
 if __name__ == '__main__':

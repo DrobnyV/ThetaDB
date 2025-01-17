@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Souhrnný Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Souhrnný Report</h1>
+        <nav>
+            <ul>
+                <li><a href="/home">Home</a></li>
+                <li><a href="/list/Rezervace">Rezervace</a></li>
+                <li><a href="/list/Audit_log">Audit Log</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Statistiky</h2>
+        <table>
+            <tr>
+                <th>Popis</th>
+                <th>Hodnota</th>
+            </tr>
+            <tr>
+                <td>Počet zákazníků</td>
+                <td>{{ report_data.pocet_zakazniku }}</td>
+            </tr>
+            <tr>
+                <td>Počet pokojů s více než 2 postelemi</td>
+                <td>{{ report_data.pokoje_s_vice_postelemi }}</td>
+            </tr>
+            <tr>
+                <td>Nejlevnější rezervace (v Kč)</td>
+                <td>{{ report_data.nejlevnejsi_rezervace }}</td>
+            </tr>
+            <tr>
+                <td>Nejdražší rezervace (v Kč)</td>
+                <td>{{ report_data.nejdrazsi_rezervace }}</td>
+            </tr>
+            <tr>
+                <td>Počet aktivních rezervací</td>
+                <td>{{ report_data.aktivni_rezervace }}</td>
+            </tr>
+        </table>
+    </main>
+    <footer>
+        <p>&copy; 2025 Hotel Management System. All rights reserved.</p>
+    </footer>
+</body>
+</html>

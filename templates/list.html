@@ -13,7 +13,9 @@
                 {% for column in columns %}
                 <th>{{ column }}</th>
                 {% endfor %}
+                {% if model != 'Rezervace' %}
                 <th>Actions</th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
@@ -22,10 +24,12 @@
                 {% for value in item %}
                 <td>{{ value }}</td>
                 {% endfor %}
+                {% if model != 'Rezervace' %}
                 <td>
                     <a href="{{ url_for('update_item', model=model, id=item[0]) }}"><button>Update</button></a>
                     <a href="{{ url_for('delete_item', model=model, id=item[0]) }}"><button>Delete</button></a>
                 </td>
+                {% endif %}
             </tr>
             {% endfor %}
         </tbody>
@@ -54,6 +58,14 @@
         <a href="{{ url_for('view_financni_prehled') }}" target="_blank">
             <button>Finanční Přehled</button>
         </a>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <form action="{{ url_for('zrus_rezervaci') }}" method="post">
+            <label for="rezervace_cislo">Zadejte číslo rezervace:</label>
+            <input type="text" id="rezervace_cislo" name="rezervace_cislo" placeholder="Číslo rezervace" required>
+            <button type="submit">Zrušit rezervaci</button>
+        </form>
     </div>
     {% endif %}
 
