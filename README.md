@@ -17,6 +17,7 @@ Import databáze:
 Použijte Server > Data Import z menu v Workbench.
 Vyberte Import from Self-Contained File a vyberte váš SQL exportní soubor.
 Zvolte hotel2 jako cílovou databázi a postupujte podle kroků importu.
+Když tyto kroky nezvládnete je taky dostupný sql soubor který stačí jenom executnout.
 
 Krok 2: Nastavení Python Prostředí
 Klonujte nebo stáhněte projekt z GitHubu:
